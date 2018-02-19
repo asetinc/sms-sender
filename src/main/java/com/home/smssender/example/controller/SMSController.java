@@ -22,13 +22,15 @@ public class SMSController {
     private SMSRepository smsRepository;
 
     @RequestMapping(value = "/sms", method = RequestMethod.POST)
-    public ResponseEntity<SMS> createSMS(SMS sms) {
+    public ResponseEntity<SMS> saveSMS(SMS sms) {
+        LOG.info("saveSMS invoked.");
         SMS smsInstance = smsRepository.save(sms);
         return new ResponseEntity<>(smsInstance, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "sms", method = RequestMethod.GET)
+    @RequestMapping(value = "/smsHistory", method = RequestMethod.GET)
     public ResponseEntity<SMSHistory> getSMSHistory() {
+        LOG.info("getSMSHistory invoked.");
         Iterable<SMS> allSMSs = smsRepository.findAll();
         List<SMS> processed = new ArrayList<SMS>();
         List<SMS> unprocessed = new ArrayList<SMS>();

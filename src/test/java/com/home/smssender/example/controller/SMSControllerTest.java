@@ -1,6 +1,5 @@
 package com.home.smssender.example.controller;
 
-import com.apress.springrest.example.quickpoll.SmsSenderApplication;
 import com.home.smssender.example.domain.SMS;
 import com.home.smssender.example.dto.SMSHistory;
 import com.home.smssender.example.repository.SMSRepository;
@@ -12,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,13 +20,17 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = SmsSenderApplication.class)
+//@SpringBootTest(classes = SmsSenderApplication.class)
 @WebAppConfiguration
 public class SMSControllerTest {
 
@@ -52,7 +54,7 @@ public class SMSControllerTest {
 
         when(smsRepository.save(any(SMS.class))).thenReturn(sms);
 
-        ResponseEntity<SMS> response = smsController.createSMS(sms);
+        ResponseEntity<SMS> response = smsController.saveSMS(sms);
 
         Matcher<Class> smsMatcher = allOf(
                 hasProperty("to", equalTo(sender)),
@@ -67,10 +69,13 @@ public class SMSControllerTest {
                 hasProperty("message", Is.is(textMessage)),
                 hasProperty("messageLength", Is.is(calculateMessageLength(textMessage)))
         ));
+
+        verify(smsRepository, times(1)).save(any(SMS.class));
+
     }
 
     @Test
-    public void shouldRetriveSmsHistory() {
+    public void shouldRetrieveSmsHistory() {
         SMS sms1 = new SMS(1L, "07788200994", Arrays.asList("07508626313", "07508626313"), "This is first message");
         sms1.setMessageSendTime(LocalDateTime.now());
         SMS sms2 = new SMS(2L, "07788200994", Arrays.asList("07432334233"), "This is second message");
